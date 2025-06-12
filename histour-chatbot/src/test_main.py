@@ -192,13 +192,17 @@ def ask_with_rag(
     if matches:
         lines = []
         for m in matches:
-            # 예: m = {"title":"경주 불국사","sim":0.44}
             title = m.get("title", "unknown")
-            sim   = m.get("sim", "")
-            lines.append(f"- {title} (sim: {sim})")
-        match_ctx = "\n[매칭된 타이틀]\n" + "\n".join(lines)
-    # 문서 컨텍스트
-    ctx = "\n---\n".join(docs)
+            lines.append(f"- {title}")
+        match_ctx = "\n매칭된 질문 주제\n" + "\n".join(lines)
+        print("mctx", match_ctx)
+        # 문서 컨텍스트
+        ctx = "\n---\n".join(docs)
+        print("ctx", ctx)
+    else:
+        # 문서 컨텍스트
+        ctx = "\n검색된 자료가 없으니 임의로 답변해줘, 영어로 물어보면 영어로 답해줘\n"
+        print("ctx",ctx)
 
     # 프롬프트 생성 시 match_ctx json 문서 삽입
     prompt = f"""
@@ -279,7 +283,8 @@ def ask_heritage_chatbot(question: str, user_gps: tuple) -> tuple[str, str | Non
         return ask_with_rag(question, matches=[match]), match['title']
     # 매칭 없음 : GPT-direct + 저장
     print("non match")
-    ans = ask_gpt_direct(question)
+    # ans = ask_gpt_direct(question)
+    ans = ask_with_rag(question)
     print("매칭 못하고 답변 생성 시작 : ", datetime.now().second, datetime.now().microsecond)
     return ans, None
 
